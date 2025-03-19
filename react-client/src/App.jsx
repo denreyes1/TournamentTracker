@@ -25,6 +25,7 @@ import CreateUser from './components/CreateUser';
 import CreateTournament from './components/CreateTournament';
 import ListTournament from './components/ListTournament';
 import ListUser from './components/ListUser';
+import Login from './components/Login';
 
 //
 function App() {
@@ -44,6 +45,7 @@ function App() {
               <Nav.Link as={Link} to="/createtournament">Create Tournament</Nav.Link> {/* Admin Only */}
               <Nav.Link as={Link} to="/listtournament">Tournament List</Nav.Link>
               <Nav.Link as={Link} to="/listuser">User List</Nav.Link> {/* Admin Only */}
+              <Nav.Link as={Link} to="/login" >Login</Nav.Link>
               
 
             </Nav>
@@ -60,6 +62,7 @@ function App() {
           <Route path = "createtournament" element={<CreateTournament/>} />
           <Route path = "listtournament" element={<ListTournament/>} />
           <Route path = "listuser" element={<ListUser/>} />
+          <Route path = "login" element={<Login/>} />
 
         </Routes>
     </div>    

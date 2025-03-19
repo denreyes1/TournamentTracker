@@ -37,32 +37,49 @@ const resolvers = {
     Mutation: {
         // Register a new user
         registerUser: async (_, { username, email, password, role }) => {
-            const existingUser = await User.findOne({ email });
+            const existingUser = await User.findOne({ username });
             if (existingUser) throw new Error("User already exists");
-
-            const hashedPassword = await bcrypt.hash(password, 10);
+        
+            if (!password) throw new Error("Password is required");
+        
+            // ✅ Hash the password before saving
+            const hashedPassword = await bcrypt.hash(password.trim(), 10);
+        
             const user = new User({ username, email, password: hashedPassword, role });
             await user.save();
-
+        
             return user;
-        },
-
+        },                   
+        
         // Login user and set JWT cookie
-        loginUser: async (_, { email, password }, { res }) => {
-            const user = await User.findOne({ email });
-            if (!user) throw new Error("User not found");
-
+        loginUser: async (_, { username, password }, { res }) => {
+            console.log("Login attempt for:", username);
+        
+            const user = await User.findOne({ username });
+            if (!user) {
+                console.log("User not found");
+                throw new Error("User not found");
+            }
+        
+            // ✅ Compare plain password with stored hash
             const isValid = await bcrypt.compare(password, user.password);
-            if (!isValid) throw new Error("Invalid credentials");
-
+            console.log("User found:", user.username, "Stored password:", user.password);
+            console.log("Password comparison result:", isValid);
+        
+            if (!isValid) {
+                console.log("Invalid credentials");
+                throw new Error("Invalid credentials");
+            }
+        
             const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
+        
             res.cookie('token', token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 maxAge: 3600000
             });
-
+        
+            console.log("User logged in successfully");
             return { message: "Logged in successfully", user };
         },
 
