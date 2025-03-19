@@ -17,38 +17,35 @@ const LOGIN_USER = gql`
   }
 `;
 
-function Login() {
-  const navigate = useNavigate();
-  const [loginUser, { loading, error }] = useMutation(LOGIN_USER);
-
-  // State for form fields
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [formError, setFormError] = useState(null);
-
-  // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setFormError(null);
-
-    if (!username || !password) {
-      setFormError("Please fill in all fields.");
-      return;
-    }
-
-    try {
-      const { data } = await loginUser({
-        variables: { username, password },
-      });
-
-      if (data?.loginUser?.user) {
-        // Redirect to dashboard or homepage after login
-        navigate("/dashboard");
+function Login({ onLoginSuccess }) {
+    const navigate = useNavigate();
+    const [loginUser, { loading, error }] = useMutation(LOGIN_USER);
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [formError, setFormError] = useState(null);
+  
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      setFormError(null);
+  
+      if (!username || !password) {
+        setFormError("Please fill in all fields.");
+        return;
       }
-    } catch (err) {
-      setFormError("Invalid credentials. Please try again.");
-    }
-  };
+  
+      try {
+        const { data } = await loginUser({ variables: { username, password } });
+  
+        if (data?.loginUser?.user) {
+          document.cookie = "token=loggedin; path=/";
+          localStorage.setItem('token', 'loggedin');
+          onLoginSuccess(); // Update the login status in App.js
+          navigate("/dashboard");
+        }
+      } catch (err) {
+        setFormError("Invalid credentials. Please try again.");
+      }
+    };
 
   return (
     <Container style={{ maxWidth: "400px", marginTop: "30px" }}>
