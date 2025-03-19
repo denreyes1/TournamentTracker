@@ -57,17 +57,13 @@ const resolvers = {
         
             const user = await User.findOne({ username });
             if (!user) {
-                console.log("User not found");
                 throw new Error("User not found");
             }
         
             // ✅ Compare plain password with stored hash
             const isValid = await bcrypt.compare(password, user.password);
-            console.log("User found:", user.username, "Stored password:", user.password);
-            console.log("Password comparison result:", isValid);
         
             if (!isValid) {
-                console.log("Invalid credentials");
                 throw new Error("Invalid credentials");
             }
         

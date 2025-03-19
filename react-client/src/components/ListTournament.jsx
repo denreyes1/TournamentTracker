@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { gql, useQuery } from "@apollo/client";
 import { Container, Table, Alert } from 'react-bootstrap';
 
@@ -41,11 +41,19 @@ function ListTournament() {
                     </tr>
                 </thead>
                 <tbody>
-                    {data.tournaments.map((tournament) => (
+                    {data?.tournaments?.map((tournament) => (
                         <tr key={tournament.id}>
                             <td>{tournament.name}</td>
                             <td>{tournament.game}</td>
-                            <td>{new Date(tournament.date).toLocaleDateString()}</td>
+                            <td>
+                            {tournament.date
+                                ? new Date(Number(tournament.date)).toLocaleDateString("en-US", {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                })
+                                : "Invalid Date"}
+                            </td>
                             <td>{tournament.status}</td>
                             <td>
                                 {tournament.players.length > 0 ? (

@@ -39,6 +39,7 @@ function Login({ onLoginSuccess }) {
         if (data?.loginUser?.user) {
           document.cookie = "token=loggedin; path=/";
           localStorage.setItem('token', 'loggedin');
+          localStorage.setItem('role', data.loginUser.user.role);
           onLoginSuccess(); // Update the login status in App.js
           navigate("/dashboard");
         }

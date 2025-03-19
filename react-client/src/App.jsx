@@ -32,11 +32,14 @@ function App() {
 function AppContent() {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState(null);
 
-  // Function to check login status
+  // Function to check login status and user role
   const checkLoginStatus = () => {
     const token = document.cookie.includes('token=loggedin') || localStorage.getItem('token');
+    const role = localStorage.getItem('role'); // Retrieve role from localStorage
     setIsLoggedIn(!!token);
+    setUserRole(role); 
   };
 
   useEffect(() => {
@@ -46,7 +49,9 @@ function AppContent() {
   const handleLogout = () => {
     document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     localStorage.removeItem('token');
+    localStorage.removeItem('userRole'); // Remove role on logout
     setIsLoggedIn(false);
+    setUserRole(null);
     navigate('/login');
   };
 
@@ -59,11 +64,23 @@ function AppContent() {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="mr-auto">
               <Nav.Link as={Link} to="/home">Home</Nav.Link>
-              <Nav.Link as={Link} to="/tournamenthistory">Tournament History</Nav.Link>
-              <Nav.Link as={Link} to="/createuser">Create User</Nav.Link>
-              <Nav.Link as={Link} to="/createtournament">Create Tournament</Nav.Link>
-              <Nav.Link as={Link} to="/listtournament">Tournament List</Nav.Link>
-              <Nav.Link as={Link} to="/listuser">User List</Nav.Link>
+
+              {isLoggedIn && userRole === "User" && (
+                <Nav.Link as={Link} to="/tournamenthistory">Tournament History</Nav.Link>
+              )}
+
+              {isLoggedIn && <Nav.Link as={Link} to="/listtournament">Tournament List</Nav.Link>}
+
+              {isLoggedIn && userRole === "Admin" && (
+                <>
+                  <Nav.Link as={Link} to="/createuser">Create User</Nav.Link>
+                  <Nav.Link as={Link} to="/createtournament">Create Tournament</Nav.Link>
+                  <Nav.Link as={Link} to="/listuser">User List</Nav.Link>
+                </>
+              )}
+
+              {!isLoggedIn && <Nav.Link as={Link} to="/createuser">Create User</Nav.Link>}
+
               {isLoggedIn ? (
                 <Nav.Link onClick={handleLogout} style={{ cursor: "pointer" }}>Logout</Nav.Link>
               ) : (
@@ -78,11 +95,16 @@ function AppContent() {
         <Routes>
           <Route index element={<Home />} />
           <Route path="home" element={<Home />} />
-          <Route path="tournamenthistory" element={<TournamentHistory />} />
-          <Route path="createuser" element={<CreateUser />} />
-          <Route path="createtournament" element={<CreateTournament />} />
-          <Route path="listtournament" element={<ListTournament />} />
-          <Route path="listuser" element={<ListUser />} />
+          {isLoggedIn && userRole === "User" && <Route path="tournamenthistory" element={<TournamentHistory />} />}
+          {isLoggedIn && <Route path="listtournament" element={<ListTournament />} />}
+          {isLoggedIn && userRole === "Admin" && (
+            <>
+              <Route path="createuser" element={<CreateUser />} />
+              <Route path="createtournament" element={<CreateTournament />} />
+              <Route path="listuser" element={<ListUser />} />
+            </>
+          )}
+          {!isLoggedIn && <Route path="createuser" element={<CreateUser />} />}
           <Route path="login" element={<Login onLoginSuccess={checkLoginStatus} />} />
         </Routes>
       </div>
