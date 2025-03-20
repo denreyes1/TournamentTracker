@@ -29,6 +29,14 @@ const JOIN_TOURNAMENT = gql`
   }
 `;
 
+const LEAVE_TOURNAMENT = gql`
+  mutation LeaveTournament($tournamentId: ID!, $playerId: ID!) {
+    leaveTournament(tournamentId: $tournamentId, playerId: $playerId) {
+      id
+    }
+  }
+`;
+
 function TournamentDetails() {
   const role = localStorage.getItem("role");
   const playerId = localStorage.getItem("playerId");
@@ -37,22 +45,31 @@ function TournamentDetails() {
     variables: { id },
   });
   const [joinTournament] = useMutation(JOIN_TOURNAMENT);
+  const [leaveTournament] = useMutation(LEAVE_TOURNAMENT);
 
   if (loading) return <Alert variant="info">Loading tournament details...</Alert>;
   if (error) return <Alert variant="danger">Error loading tournament</Alert>;
 
   const tournament = data.tournament;
 
-  const handleJoin = async () => {
-    console.log("Joining Tournament with:");
-    console.log("playerId:", playerId);
-    console.log("tournamentId:", id);
+  // Check if the current player is already in the tournament
+  const isPlayerJoined = tournament.players.some((player) => player.id === playerId);
 
+  const handleJoin = async () => {
     try {
-      await joinTournament({ variables: { tournamentId: id, playerId: playerId } });
+      await joinTournament({ variables: { tournamentId: id, playerId } });
       refetch();
     } catch (error) {
       console.error("Error joining tournament:", error);
+    }
+  };
+
+  const handleLeave = async () => {
+    try {
+      await leaveTournament({ variables: { tournamentId: id, playerId } });
+      refetch();
+    } catch (error) {
+      console.error("Error leaving tournament:", error);
     }
   };
 
@@ -76,17 +93,29 @@ function TournamentDetails() {
           </tr>
         </thead>
         <tbody>
-          {tournament.players.map((player) => (
-            <tr key={player.id}>
-              <td>{player.user.username}</td>
+          {tournament.players.length > 0 ? (
+            tournament.players.map((player) => (
+              <tr key={player.id}>
+                <td>{player.user.username}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="1" style={{ textAlign: "center" }}>No one has joined yet.</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </Table>
       {role === "Player" && (
-        <Button onClick={handleJoin} variant="primary">
-          Join Tournament
-        </Button>
+        isPlayerJoined ? (
+          <Button onClick={handleLeave} variant="danger">
+            Leave Tournament
+          </Button>
+        ) : (
+          <Button onClick={handleJoin} variant="primary">
+            Join Tournament
+          </Button>
+        )
       )}
     </Container>
   );

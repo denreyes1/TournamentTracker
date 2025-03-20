@@ -44,10 +44,22 @@ const resolvers = {
         },
         
         // Fetch all tournaments
-        tournaments: async () => await Tournament.find().populate('players'),
+        tournaments: async () => await Tournament.find().populate({
+            path: 'players',
+            populate: {
+                path: 'user',
+                model: 'User'
+            }
+        }),
 
         // Fetch a tournament by ID
-        tournament: async (_, { id }) => await Tournament.findById(id).populate('players'),
+        tournament: async (_, { id }) => await Tournament.findById(id).populate({
+            path: 'players',
+            populate: {
+                path: 'user',
+                model: 'User'
+            }
+        }),
 
         // Check authenticated user (JWT token required)
         me: async (_, __, { req }) => {
@@ -142,6 +154,24 @@ const resolvers = {
                 player.tournaments.push(tournamentId);
                 await player.save();
             }
+
+            return tournament;
+        },
+
+        // Remove a player from a tournament
+        leaveTournament: async (_, { tournamentId, playerId }) => {
+            const tournament = await Tournament.findById(new ObjectId(tournamentId));
+            const player = await Player.findById(new ObjectId(playerId));
+
+            if (!tournament || !player) throw new Error("Tournament or Player not found");
+
+            // Remove player from tournament's players list
+            tournament.players = tournament.players.filter(id => id.toString() !== playerId);
+            await tournament.save();
+
+            // Remove tournament from player's tournaments list
+            player.tournaments = player.tournaments.filter(id => id.toString() !== tournamentId);
+            await player.save();
 
             return tournament;
         },

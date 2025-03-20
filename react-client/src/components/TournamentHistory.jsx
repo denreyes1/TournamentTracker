@@ -1,172 +1,70 @@
-import React, { useState } from 'react';
-import { gql, useMutation } from "@apollo/client";
-import { useNavigate } from 'react-router-dom';
-import { Container, Form, Button, Row, Col, Alert } from 'react-bootstrap';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { gql, useQuery } from "@apollo/client";
+import { Container, Table, Alert } from "react-bootstrap";
 
-// GraphQL Mutation to Add a Movie
-const ADD_MOVIE = gql`
-  mutation AddMovie(
-    $movieId: Int!,
-    $title: String!,
-    $year: Int!,
-    $genre: String!,
-    $description: String!,
-    $rating: Float,
-    $watched: Boolean
-  ) {
-    createMovie(
-      movieId: $movieId,
-      title: $title,
-      year: $year,
-      genre: $genre,
-      description: $description,
-      rating: $rating,
-      watched: $watched
-    ) {
-      id
-      movieId
-      title
+const GET_PLAYER_BY_USER = gql`
+  query Player($playerId: ID!) {
+    player(id: $playerId) {
+        tournaments {
+            id
+            name
+            game
+            date
+            status
+            }
+        }
     }
-  }
 `;
 
 function TournamentHistory() {
-    const navigate = useNavigate();
-    const [addMovie, { error, loading }] = useMutation(ADD_MOVIE);
-    
-    // State Hooks for Form Fields
-    const [movieId, setMovieId] = useState('');
-    const [title, setTitle] = useState('');
-    const [year, setYear] = useState('');
-    const [genre, setGenre] = useState('');
-    const [description, setDescription] = useState('');
-    const [rating, setRating] = useState('');
-    const [watched, setWatched] = useState(false);
-    const [formError, setFormError] = useState(null);
+  const playerId = localStorage.getItem("playerId");
+  const navigate = useNavigate();
+  const { data, loading, error } = useQuery(GET_PLAYER_BY_USER, {
+    variables: { playerId },
+  });
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setFormError(null); // Reset previous errors
+  if (loading) return <Alert variant="info">Loading tournaments...</Alert>;
+  if (error) return <Alert variant="danger">Error loading tournaments</Alert>;
+  if (!data?.player?.tournaments.length) {
+    return <Alert variant="warning">No tournaments joined.</Alert>;
+  }
 
-        // Validate inputs
-        if (!movieId || !title || !year || !genre || !description) {
-            setFormError("All fields except rating are required.");
-            return;
-        }
-
-        try {
-            await addMovie({
-                variables: {
-                    movieId: parseInt(movieId),
-                    title,
-                    year: parseInt(year),
-                    genre,
-                    description,
-                    rating: rating ? parseFloat(rating) : null,
-                    watched
-                }
-            });
-
-            // Clear form fields
-            setMovieId('');
-            setTitle('');
-            setYear('');
-            setGenre('');
-            setDescription('');
-            setRating('');
-            setWatched(false);
-
-            // Navigate after success
-            navigate('/movielist');
-        } catch (err) {
-            setFormError("Error adding movie. Please try again.");
-        }
-    };
-
-    return (
-        <Container style={{ maxWidth: '500px', marginTop: '20px' }}>
-            <h2>Add Movie</h2>
-
-            {formError && <Alert variant="danger">{formError}</Alert>}
-            {error && <Alert variant="danger">GraphQL Error: {error.message}</Alert>}
-            {loading && <Alert variant="info">Adding Movie...</Alert>}
-
-            <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3">
-                    <Form.Label>Movie Id</Form.Label>
-                    <Form.Control
-                        type="number"
-                        placeholder="Movie Id"
-                        value={movieId}
-                        onChange={(e) => setMovieId(e.target.value)}
-                    />
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                    <Form.Label>Title</Form.Label>
-                    <Form.Control
-                        type="text"
-                        placeholder="Title"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                    />
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                <Form.Label>Year</Form.Label>
-                    <Form.Control
-                        type="number"
-                        placeholder="Year"
-                        value={year}
-                        onChange={(e) => setYear(e.target.value)}
-                    />
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                    <Form.Label>Genre</Form.Label>
-                    <Form.Control
-                        type="text"
-                        placeholder="Genre"
-                        value={genre}
-                        onChange={(e) => setGenre(e.target.value)}
-                    />
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                    <Form.Label>Description</Form.Label>
-                    <Form.Control
-                        as="textarea"
-                        placeholder="Description"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                    />
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                    <Form.Label>Rating</Form.Label>
-                    <Form.Control
-                        type="number"
-                        placeholder="Rating (0-10)"
-                        value={rating}
-                        onChange={(e) => setRating(e.target.value)}
-                    />
-                </Form.Group>
-
-                <Form.Group className="mb-3 d-flex align-items-center">
-                    <Form.Check
-                        type="checkbox"
-                        label="Watched"
-                        checked={watched}
-                        onChange={(e) => setWatched(e.target.checked)}
-                    />
-                </Form.Group>
-
-                <Button variant="primary" type="submit" disabled={loading} className="w-100">
-                    Save
-                </Button>
-            </Form>
-        </Container>
-    );
+  return (
+    <Container style={{ marginTop: "20px" }}>
+      <h2>Joined Tournaments</h2>
+      <Table striped bordered hover>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Game</th>
+            <th>Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.player.tournaments.map((tournament) => (
+            <tr
+              key={tournament.id}
+              style={{ cursor: "pointer" }}
+              onClick={() => navigate(`/tournament/${tournament.id}`)}
+            >
+              <td>{tournament.name}</td>
+              <td>{tournament.game}</td>
+              <td>
+                {new Date(Number(tournament.date)).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </td>
+              <td>{tournament.status}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </Container>
+  );
 }
 
 export default TournamentHistory;

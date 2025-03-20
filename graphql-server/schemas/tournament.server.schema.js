@@ -59,6 +59,7 @@ const typeDefs = gql`
         createPlayer(userId: ID!, ranking: Int!): Player
         createTournament(name: String!, game: String!, date: String!, status: String!): Tournament
         addPlayerToTournament(tournamentId: ID!, playerId: ID!): Tournament
+        leaveTournament(tournamentId: ID!, playerId: ID!): Tournament
         updateTournamentStatus(tournamentId: ID!, status: String!): Tournament
         deleteTournament(tournamentId: ID!): Response
     }

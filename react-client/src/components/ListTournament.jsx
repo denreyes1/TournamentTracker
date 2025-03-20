@@ -30,7 +30,7 @@ function TournamentHistory() {
 
   return (
     <Container style={{ marginTop: "20px" }}>
-      <h2>Tournament History</h2>
+      <h2>Tournament List</h2>
       <Table striped bordered hover>
         <thead>
           <tr>
