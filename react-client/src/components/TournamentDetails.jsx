@@ -95,6 +95,9 @@ function TournamentDetails() {
     refetch();
   };
 
+  // Extract existing player IDs
+  const existingPlayerIds = new Set(tournament.players.map(player => player.id));
+
   return (
     <Container style={{ marginTop: "20px" }}>
       <h2>{tournament.name}</h2>
@@ -156,15 +159,17 @@ function TournamentDetails() {
 
           {showDropdown && searchResults?.searchPlayers.length > 0 && (
             <ListGroup style={{ position: "absolute", width: "50%", zIndex: 10, backgroundColor: "white" }}>
-              {searchResults.searchPlayers.map((player) => (
-                <ListGroup.Item
-                  key={player.user.id}
-                  action
-                  onClick={() => handleAddPlayer(player.id)}
-                >
+              {searchResults.searchPlayers
+                .filter(player => !existingPlayerIds.has(player.id)) // Exclude already added players
+                .map((player) => (
+                  <ListGroup.Item
+                    key={player.user.id}
+                    action
+                    onClick={() => handleAddPlayer(player.id)}
+                  >
                     {player.user.username}
-                </ListGroup.Item>
-              ))}
+                  </ListGroup.Item>
+                ))}
             </ListGroup>
           )}
         </div>
