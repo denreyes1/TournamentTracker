@@ -98,25 +98,47 @@ function CreateUser() {
             {error && <Alert variant="danger">GraphQL Error: {error.message}</Alert>}
             {loading && <Alert variant="info">Registering User...</Alert>}
             <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3">
-                    <Form.Label>Username</Form.Label>
-                    <Form.Control type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    <Form.Label>Email</Form.Label>
-                    <Form.Control type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    <Form.Label>Password</Form.Label>
-                    <Form.Control type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    <Form.Label>Role</Form.Label>
-                    <Form.Control as="select" value={role} onChange={(e) => setRole(e.target.value)}>
-                        <option value="Player">Player</option>
-                        <option value="Admin">Admin</option>
-                    </Form.Control>
-                </Form.Group>
+            <Form.Group className="mb-3">
+                <Form.Label>Username</Form.Label>
+                <Form.Control 
+                    type="text" 
+                    placeholder="Enter username" 
+                    value={username} 
+                    onChange={(e) => setUsername(e.target.value)} 
+                />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+                <Form.Label>Email</Form.Label>
+                <Form.Control 
+                    type="email" 
+                    placeholder="Enter email (e.g., user@example.com)" 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)} 
+                />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+                <Form.Label>Password</Form.Label>
+                <Form.Control 
+                    type="password" 
+                    placeholder="Enter password" 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)} 
+                />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+                <Form.Label>Role</Form.Label>
+                <Form.Control 
+                    as="select" 
+                    value={role} 
+                    onChange={(e) => setRole(e.target.value)}
+                >
+                    <option value="Player">Player</option>
+                    <option value="Admin">Admin</option>
+                </Form.Control>
+            </Form.Group>
                 <Button variant="primary" type="submit" disabled={loading} className="w-100">
                     Register
                 </Button>

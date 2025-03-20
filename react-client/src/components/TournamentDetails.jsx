@@ -13,6 +13,7 @@ const GET_TOURNAMENT = gql`
       status
       players {
         id
+        ranking
         user {
           username
         }
@@ -71,7 +72,9 @@ function TournamentDetails() {
   if (error) return <Alert variant="danger">Error loading tournament</Alert>;
 
   const tournament = data.tournament;
+  const isCompleted = tournament.status === "Completed";
   const isPlayerJoined = tournament.players.some((player) => player.id === playerId);
+  const isPlayerListEmpty = tournament.players.length === 0;
 
   const handleJoin = async () => {
     await joinTournament({ variables: { tournamentId: id, playerId } });
@@ -95,20 +98,22 @@ function TournamentDetails() {
     refetch();
   };
 
-  const existingPlayerIds = new Set(tournament.players.map(player => player.id));
+  const existingPlayerIds = new Set(tournament.players.map((player) => player.id));
 
   return (
     <Container className="d-flex justify-content-center align-items-center" style={{ marginTop: "50px" }}>
       <Card style={{ width: "80vw", maxWidth: "1200px", padding: "32px" }}>
         <h3 className="text-center">{tournament.name}</h3>
         <p className="text-center">
-          <strong>Game:</strong> {tournament.game} | <strong>Date:</strong> {new Date(Number(tournament.date)).toLocaleDateString("en-US")} | <strong>Status:</strong> {tournament.status}
+          <strong>Game:</strong> {tournament.game} | <strong>Date:</strong>{" "}
+          {new Date(Number(tournament.date)).toLocaleDateString("en-US")} | <strong>Status:</strong>{" "}
+          {tournament.status}
         </p>
 
         {/* Players Header and Search Bar in Same Line */}
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h5 className="mb-0">Players</h5>
-          {role === "Admin" && (
+          {role === "Admin" && !isCompleted && (
             <div style={{ width: "250px" }}>
               <Form.Control
                 type="text"
@@ -124,13 +129,9 @@ function TournamentDetails() {
               {showDropdown && searchResults?.searchPlayers.length > 0 && (
                 <ListGroup style={{ position: "absolute", width: "250px", zIndex: 10, backgroundColor: "white" }}>
                   {searchResults.searchPlayers
-                    .filter(player => !existingPlayerIds.has(player.id))
+                    .filter((player) => !existingPlayerIds.has(player.id))
                     .map((player) => (
-                      <ListGroup.Item
-                        key={player.user.id}
-                        action
-                        onClick={() => handleAddPlayer(player.id)}
-                      >
+                      <ListGroup.Item key={player.user.id} action onClick={() => handleAddPlayer(player.id)}>
                         {player.user.username}
                       </ListGroup.Item>
                     ))}
@@ -140,35 +141,39 @@ function TournamentDetails() {
           )}
         </div>
 
-        <Table striped bordered>
-          <thead>
-            <tr>
-              <th>Username</th>
-              {role === "Admin" && <th>Actions</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {tournament.players.map((player) => (
-              <tr key={player.id}>
-                <td>{player.user.username}</td>
-                {role === "Admin" && (
-                  <td style={{ width: "1px", whiteSpace: "nowrap" }}>
-                    <Button onClick={() => handleRemovePlayer(player.id)} variant="danger" size="sm">
-                      Remove
-                    </Button>
-                  </td>
-                )}
+        {isPlayerListEmpty ? (
+          <Alert variant="warning">No players have joined the tournament.</Alert>
+        ) : (
+          <Table striped bordered>
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Rank</th>
+                {role === "Admin" && <th>Actions</th>}
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {tournament.players.map((player, index) => (
+                <tr key={player.id}>
+                  <td>{player.user.username}</td>
+                  <td>{player.ranking}</td>
+                  {role === "Admin" && (
+                    <td style={{ width: "1px", whiteSpace: "nowrap" }}>
+                      <Button onClick={() => handleRemovePlayer(player.id)} variant="danger" size="sm">
+                        Remove
+                      </Button>
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        )}
 
         {role === "Player" && (
-          isPlayerJoined ? (
-            <Button onClick={handleLeave} variant="danger" className="w-100">Leave Tournament</Button>
-          ) : (
-            <Button onClick={handleJoin} variant="primary" className="w-100">Join Tournament</Button>
-          )
+          <Button onClick={isCompleted ? null : isPlayerJoined ? handleLeave : handleJoin} variant={isCompleted ? "secondary" : isPlayerJoined ? "danger" : "primary"} className="w-100" disabled={isCompleted}>
+            {isCompleted ? "Tournament has completed" : isPlayerJoined ? "Leave Tournament" : "Join Tournament"}
+          </Button>
         )}
       </Card>
     </Container>
