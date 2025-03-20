@@ -14,6 +14,40 @@ const resolvers = {
         // Fetch a user by ID
         user: async (_, { id }) => await User.findById(id),
 
+        // Search users by username
+        searchUsers: async (_, { username }) => {
+            try {
+                const users = await User.find({
+                    username: { $regex: new RegExp(username, "i") } // Case-insensitive search
+                });
+                return users;
+            } catch (error) {
+                console.error("Error searching users:", error);
+                throw new Error("Failed to search users");
+            }
+        },
+
+        // Search Players by username
+        searchPlayers: async (_, { username }) => {
+            try {
+                // Find users that match the search query
+                const users = await User.find({
+                    username: { $regex: new RegExp(username, "i") } // Case-insensitive search
+                });
+
+                // Extract user IDs
+                const userIds = users.map(user => user._id);
+
+                // Find players associated with the found users
+                const players = await Player.find({ user: { $in: userIds } }).populate('user tournaments');
+
+                return players;
+            } catch (error) {
+                console.error("Error searching players:", error);
+                throw new Error("Failed to search players");
+            }
+        },
+        
         // Fetch all players
         players: async () => await Player.find().populate('user tournaments'),
 
