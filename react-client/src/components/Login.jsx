@@ -72,14 +72,14 @@ function Login({ onLoginSuccess }) {
                                 console.log("Player ID not found");
                             }
                             onLoginSuccess();
-                            navigate("/dashboard");
+                            navigate("/home");
                         })
                         .catch((error) => {
                             console.error("Error fetching player ID:", error);
                         });
                 } else {
                     onLoginSuccess();
-                    navigate("/dashboard");
+                    navigate("/home");
                 }
             }
         } catch (err) {

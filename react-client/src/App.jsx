@@ -63,12 +63,12 @@ function AppContent() {
 
   return (
     <>
-      <Navbar bg="primary" variant="dark" expand="lg">
+      <Navbar bg="dark" variant="dark" expand="lg" fixed="top" className="w-100">
         <Container>
           <Navbar.Brand as={Link} to="/home">Gaming Tournament System</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="mr-auto">
+            <Nav className="me-auto">
               <Nav.Link as={Link} to="/home">Home</Nav.Link>
 
               {isLoggedIn && userRole === "Player" && (
@@ -86,7 +86,10 @@ function AppContent() {
               )}
 
               {!isLoggedIn && <Nav.Link as={Link} to="/createuser">Create User</Nav.Link>}
+            </Nav>
 
+            {/* Right-aligned Login/Logout */}
+            <Nav className="ms-auto">
               {isLoggedIn ? (
                 <Nav.Link onClick={handleLogout} style={{ cursor: "pointer" }}>Logout</Nav.Link>
               ) : (

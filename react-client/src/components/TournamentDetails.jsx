@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import { useParams } from "react-router-dom";
-import { Container, Button, Table, Alert, Form, ListGroup } from "react-bootstrap";
+import { Container, Button, Table, Alert, Form, ListGroup, Card } from "react-bootstrap";
 
 const GET_TOURNAMENT = gql`
   query GetTournament($id: ID!) {
@@ -95,85 +95,82 @@ function TournamentDetails() {
     refetch();
   };
 
-  // Extract existing player IDs
   const existingPlayerIds = new Set(tournament.players.map(player => player.id));
 
   return (
-    <Container style={{ marginTop: "20px" }}>
-      <h2>{tournament.name}</h2>
-      <p>
-        <strong>Game:</strong> {tournament.game}
-      </p>
-      <p>
-        <strong>Date:</strong> {new Date(Number(tournament.date)).toLocaleDateString("en-US")}
-      </p>
-      <p>
-        <strong>Status:</strong> {tournament.status}
-      </p>
-      
-      <h4>Players</h4>
-      <Table striped bordered>
-        <thead>
-          <tr>
-            <th>Username</th>
-            {role === "Admin" && <th>Actions</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {tournament.players.map((player) => (
-            <tr key={player.id}>
-              <td>{player.user.username}</td>
-              {role === "Admin" && (
-                <td>
-                  <Button onClick={() => handleRemovePlayer(player.id)} variant="danger" size="sm">
-                    Remove
-                  </Button>
-                </td>
+    <Container className="d-flex justify-content-center align-items-center" style={{ marginTop: "50px" }}>
+      <Card style={{ width: "80vw", maxWidth: "1200px", padding: "20px" }}>
+        <h3 className="text-center">{tournament.name}</h3>
+        <p className="text-center">
+          <strong>Game:</strong> {tournament.game} | <strong>Date:</strong> {new Date(Number(tournament.date)).toLocaleDateString("en-US")} | <strong>Status:</strong> {tournament.status}
+        </p>
+
+        {/* Players Header and Search Bar in Same Line */}
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h5 className="mb-0">Players</h5>
+          {role === "Admin" && (
+            <div style={{ width: "250px" }}>
+              <Form.Control
+                type="text"
+                placeholder="Search for a player to add"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setShowDropdown(true);
+                }}
+                onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+              />
+
+              {showDropdown && searchResults?.searchPlayers.length > 0 && (
+                <ListGroup style={{ position: "absolute", width: "250px", zIndex: 10, backgroundColor: "white" }}>
+                  {searchResults.searchPlayers
+                    .filter(player => !existingPlayerIds.has(player.id))
+                    .map((player) => (
+                      <ListGroup.Item
+                        key={player.user.id}
+                        action
+                        onClick={() => handleAddPlayer(player.id)}
+                      >
+                        {player.user.username}
+                      </ListGroup.Item>
+                    ))}
+                </ListGroup>
               )}
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-
-      {role === "Player" && (
-        isPlayerJoined ? (
-          <Button onClick={handleLeave} variant="danger">Leave Tournament</Button>
-        ) : (
-          <Button onClick={handleJoin} variant="primary">Join Tournament</Button>
-        )
-      )}
-
-      {role === "Admin" && (
-        <div>
-          <h4>Add Player</h4>
-          <Form.Control
-            type="text"
-            placeholder="Search for a player to add"
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setShowDropdown(true);
-            }}
-            onBlur={() => setTimeout(() => setShowDropdown(false), 200)} // Delay hiding to allow clicking
-          />
-
-          {showDropdown && searchResults?.searchPlayers.length > 0 && (
-            <ListGroup style={{ position: "absolute", width: "50%", zIndex: 10, backgroundColor: "white" }}>
-              {searchResults.searchPlayers
-                .filter(player => !existingPlayerIds.has(player.id)) // Exclude already added players
-                .map((player) => (
-                  <ListGroup.Item
-                    key={player.user.id}
-                    action
-                    onClick={() => handleAddPlayer(player.id)}
-                  >
-                    {player.user.username}
-                  </ListGroup.Item>
-                ))}
-            </ListGroup>
+            </div>
           )}
         </div>
-      )}
+
+        <Table striped bordered>
+          <thead>
+            <tr>
+              <th>Username</th>
+              {role === "Admin" && <th>Actions</th>}
+            </tr>
+          </thead>
+          <tbody>
+            {tournament.players.map((player) => (
+              <tr key={player.id}>
+                <td>{player.user.username}</td>
+                {role === "Admin" && (
+                  <td style={{ width: "1px", whiteSpace: "nowrap" }}>
+                    <Button onClick={() => handleRemovePlayer(player.id)} variant="danger" size="sm">
+                      Remove
+                    </Button>
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+
+        {role === "Player" && (
+          isPlayerJoined ? (
+            <Button onClick={handleLeave} variant="danger" className="w-100">Leave Tournament</Button>
+          ) : (
+            <Button onClick={handleJoin} variant="primary" className="w-100">Join Tournament</Button>
+          )
+        )}
+      </Card>
     </Container>
   );
 }
