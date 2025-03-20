@@ -35,7 +35,7 @@ function CreateUser() {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [role, setRole] = useState('User');
+    const [role, setRole] = useState('Player');
     const [formError, setFormError] = useState(null);
 
     const handleSubmit = async (e) => {
@@ -52,7 +52,7 @@ function CreateUser() {
             setUsername('');
             setEmail('');
             setPassword('');
-            setRole('User');
+            setRole('Player');
             navigate('/userlist');
         } catch (err) {
             setFormError("Error registering user. Please try again.");
@@ -81,7 +81,7 @@ function CreateUser() {
                 <Form.Group className="mb-3">
                     <Form.Label>Role</Form.Label>
                     <Form.Control as="select" value={role} onChange={(e) => setRole(e.target.value)}>
-                        <option value="User">User</option>
+                        <option value="Player">Player</option>
                         <option value="Admin">Admin</option>
                     </Form.Control>
                 </Form.Group>

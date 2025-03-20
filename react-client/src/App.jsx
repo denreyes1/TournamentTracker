@@ -65,7 +65,7 @@ function AppContent() {
             <Nav className="mr-auto">
               <Nav.Link as={Link} to="/home">Home</Nav.Link>
 
-              {isLoggedIn && userRole === "User" && (
+              {isLoggedIn && userRole === "Player" && (
                 <Nav.Link as={Link} to="/tournamenthistory">Tournament History</Nav.Link>
               )}
 
@@ -95,7 +95,7 @@ function AppContent() {
         <Routes>
           <Route index element={<Home />} />
           <Route path="home" element={<Home />} />
-          {isLoggedIn && userRole === "User" && <Route path="tournamenthistory" element={<TournamentHistory />} />}
+          {isLoggedIn && userRole === "Player" && <Route path="tournamenthistory" element={<TournamentHistory />} />}
           {isLoggedIn && <Route path="listtournament" element={<ListTournament />} />}
           {isLoggedIn && userRole === "Admin" && (
             <>
