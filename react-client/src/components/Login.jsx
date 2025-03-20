@@ -19,8 +19,12 @@ const LOGIN_USER = gql`
 
 // GraphQL Query to Fetch Player ID for a Given User
 const GET_PLAYER_BY_USER = gql`
-  query GetPlayerByUser($user: ID!) {
-    getPlayerByUser(user: $user) {
+  query GetPlayerByUser($userId: ID!) {
+    getPlayerByUser(userId: $userId) {
+      user {
+        username
+        id
+      }
       id
     }
   }
@@ -58,7 +62,7 @@ function Login({ onLoginSuccess }) {
                 if (role === "Player") {
                     // Fetch player ID using userId
                     console.log("Attempting to fetch player by user id - ", userId);
-                    getPlayerByUser({ variables: { user: userId } })  // ✅ Fixed variable name
+                    getPlayerByUser({ variables: { userId: userId } })  // ✅ Fixed variable name
                         .then(({ data }) => {
                             const player = data?.getPlayerByUser;
                             if (player) {

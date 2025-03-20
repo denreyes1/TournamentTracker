@@ -31,7 +31,7 @@ const JOIN_TOURNAMENT = gql`
 
 function TournamentDetails() {
   const role = localStorage.getItem("role");
-  const userId = localStorage.getItem("userId");
+  const playerId = localStorage.getItem("playerId");
   const { id } = useParams();
   const { data, loading, error, refetch } = useQuery(GET_TOURNAMENT, {
     variables: { id },
@@ -45,11 +45,11 @@ function TournamentDetails() {
 
   const handleJoin = async () => {
     console.log("Joining Tournament with:");
-    console.log("playerId:", userId);
+    console.log("playerId:", playerId);
     console.log("tournamentId:", id);
 
     try {
-      await joinTournament({ variables: { tournamentId: id, playerId: userId } });
+      await joinTournament({ variables: { tournamentId: id, playerId: playerId } });
       refetch();
     } catch (error) {
       console.error("Error joining tournament:", error);

@@ -16,12 +16,12 @@ async function startServer() {
   // Middleware
   app.use(cookieParser());
   app.use(express.json());
-  app.use(
-      cors({
-          origin: [process.env.CLIENT_URL, 'http://localhost:3000', 'http://localhost:5174'],
-          credentials: true,
-      })
-  );
+  // app.use(
+  //     cors({
+  //         origin: [process.env.CLIENT_URL, 'http://localhost:3000', 'http://localhost:5174'],
+  //         credentials: true,
+  //     })
+  // );
   
   // Connect to MongoDB
   mongoose.connect('mongodb://0.0.0.0:27017/DenisjannReyes-lab-assignment2', {

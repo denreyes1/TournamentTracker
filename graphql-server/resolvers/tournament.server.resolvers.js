@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user.server.model');
 const Player = require('../models/player.server.model');
 const Tournament = require('../models/tournament.server.model');
+const { ObjectId } = require('mongodb');
 require('dotenv').config();
 
 const resolvers = {
@@ -20,11 +21,26 @@ const resolvers = {
         player: async (_, { id }) => await Player.findById(id).populate('user tournaments'),
 
         // Fetch a player by userId
-        getPlayerByUser: async (_, { user }) => {
-            console.log("Trying to find it....")
-            const player = await Player.findOne({ user }).populate('user tournaments');
-            if (!player) throw new Error("Player not found");
-            return player;
+        getPlayerByUser: async (_, { userId }) => {
+            console.log("Received userId:", userId);
+        
+            try {
+                const uid = new ObjectId(userId);
+                console.log("Converted userId to ObjectId:", uid);
+        
+                const player = await Player.findOne({ user: uid }).populate('user tournaments');
+                console.log("Queried player:", player);
+        
+                if (!player) {
+                    console.error("Player not found in database");
+                    throw new Error("Player not found");
+                }
+        
+                return player;
+            } catch (error) {
+                console.error("Error in getPlayerByUser resolver:", error);
+                throw new Error("Internal server error");
+            }
         },
         
         // Fetch all tournaments
@@ -112,8 +128,8 @@ const resolvers = {
 
         // Add a player to a tournament
         addPlayerToTournament: async (_, { tournamentId, playerId }) => {
-            const tournament = await Tournament.findById(ObjectId(tournamentId));
-            const player = await Player.findById(ObjectId(playerId));
+            const tournament = await Tournament.findById(new ObjectId(tournamentId));
+            const player = await Player.findById(new ObjectId(playerId));
 
             if (!tournament || !player) throw new Error("Tournament or Player not found");
 
