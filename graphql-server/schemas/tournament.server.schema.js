@@ -44,6 +44,7 @@ const typeDefs = gql`
         user(id: ID!): User
         players: [Player]
         player(id: ID!): Player
+        getPlayerByUser(userId: ID!): Player
         tournaments: [Tournament]
         tournament(id: ID!): Tournament
         me: User

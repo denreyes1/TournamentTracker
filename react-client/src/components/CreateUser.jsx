@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { useNavigate } from 'react-router-dom';
-import { Container, Form, Button, Alert, Table } from 'react-bootstrap';
+import { Container, Form, Button, Alert } from 'react-bootstrap';
 
 // GraphQL Mutation to Register User
 const REGISTER_USER = gql`
@@ -10,27 +10,29 @@ const REGISTER_USER = gql`
       id
       username
       email
+      role
     }
   }
 `;
 
-// GraphQL Query to Fetch Users
-const GET_USERS = gql`
-  query GetUsers {
-    users {
+// GraphQL Mutation to Create Player (Now includes `tournaments: []`)
+const CREATE_PLAYER = gql`
+  mutation CreatePlayer($userId: ID!, $ranking: Int!) {
+    createPlayer(userId: $userId, ranking: $ranking) {
       id
-      username
-      email
-      role
+      user {
+        id
+        username
+      }
+      ranking
     }
   }
 `;
 
 function CreateUser() {
     const navigate = useNavigate();
-    const [registerUser, { error, loading }] = useMutation(REGISTER_USER, {
-        refetchQueries: [{ query: GET_USERS }],
-    });
+    const [registerUser, { error, loading }] = useMutation(REGISTER_USER);
+    const [createPlayer] = useMutation(CREATE_PLAYER);
     
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -47,15 +49,44 @@ function CreateUser() {
             return;
         }
 
+        console.log("Sending to GraphQL:", { username, email, password, role });
+
         try {
-            await registerUser({ variables: { username, email, password, role } });
+            const { data } = await registerUser({
+                variables: { username, email, password, role }
+            });
+
+            if (!data?.registerUser?.id) {
+                throw new Error("User ID is missing after registration.");
+            }
+
+            let userId = data.registerUser.id;
+        
+            try {
+                // Ensure userId is a string before passing it to createPlayer
+                userId = String(userId);
+                console.log("Processed userId:", userId, "Type:", typeof userId);
+    
+                if (data.registerUser.role === "Player") {
+                    console.log("Creating player for user ID:", userId);
+                    await createPlayer({
+                        variables: { userId, ranking: 0}
+                    });
+                }
+            } catch (err) {
+            }
+
+            // Reset form
             setUsername('');
             setEmail('');
             setPassword('');
-            setRole('Player');
-            navigate('/userlist');
+            setRole('');
+            
+            console.log("User created successfully!");
+            navigate('/home');
         } catch (err) {
-            setFormError("Error registering user. Please try again.");
+            console.error("GraphQL Error:", err.networkError?.result || err);
+            setFormError(err.message || "Error registering user. Please try again.");
         }
     };
 

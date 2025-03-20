@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const PlayerSchema = new Schema({
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     ranking: { type: Number, default: 0 },
-    tournaments: [{ type: Schema.Types.ObjectId, ref: 'Tournament' }]
+    tournaments: [{ type: Schema.Types.ObjectId, ref: 'Tournament', default: [] }]
 });
 
 // Create and export Player model

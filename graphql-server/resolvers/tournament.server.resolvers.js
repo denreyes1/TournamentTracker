@@ -19,6 +19,14 @@ const resolvers = {
         // Fetch a player by ID
         player: async (_, { id }) => await Player.findById(id).populate('user tournaments'),
 
+        // Fetch a player by userId
+        getPlayerByUser: async (_, { user }) => {
+            console.log("Trying to find it....")
+            const player = await Player.findOne({ user }).populate('user tournaments');
+            if (!player) throw new Error("Player not found");
+            return player;
+        },
+        
         // Fetch all tournaments
         tournaments: async () => await Tournament.find().populate('players'),
 
@@ -42,7 +50,6 @@ const resolvers = {
         
             if (!password) throw new Error("Password is required");
         
-            // ✅ Hash the password before saving
             const hashedPassword = await bcrypt.hash(password.trim(), 10);
         
             const user = new User({ username, email, password: hashedPassword, role });
@@ -60,7 +67,6 @@ const resolvers = {
                 throw new Error("User not found");
             }
         
-            // ✅ Compare plain password with stored hash
             const isValid = await bcrypt.compare(password, user.password);
         
             if (!isValid) {
@@ -87,9 +93,11 @@ const resolvers = {
 
         // Create a player
         createPlayer: async (_, { userId, ranking }) => {
+            console.error("createPlayer...")
             const user = await User.findById(userId);
             if (!user) throw new Error("User not found");
 
+            console.error("Attempting to save user")
             const player = new Player({ user: userId, ranking });
             await player.save();
             return player;
@@ -104,8 +112,8 @@ const resolvers = {
 
         // Add a player to a tournament
         addPlayerToTournament: async (_, { tournamentId, playerId }) => {
-            const tournament = await Tournament.findById(tournamentId);
-            const player = await Player.findById(playerId);
+            const tournament = await Tournament.findById(ObjectId(tournamentId));
+            const player = await Player.findById(ObjectId(playerId));
 
             if (!tournament || !player) throw new Error("Tournament or Player not found");
 

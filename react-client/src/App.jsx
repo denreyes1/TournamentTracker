@@ -19,6 +19,7 @@ import CreateTournament from './components/CreateTournament';
 import ListTournament from './components/ListTournament';
 import ListUser from './components/ListUser';
 import Login from './components/Login';
+import TournamentDetails from "./components/TournamentDetails";
 
 function App() {
   return (
@@ -32,14 +33,17 @@ function App() {
 function AppContent() {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userId, setUserId] = useState(null);
   const [userRole, setUserRole] = useState(null);
 
   // Function to check login status and user role
   const checkLoginStatus = () => {
     const token = document.cookie.includes('token=loggedin') || localStorage.getItem('token');
-    const role = localStorage.getItem('role'); // Retrieve role from localStorage
+    const role = localStorage.getItem('role');
+    const userId = localStorage.getItem('userId');
     setIsLoggedIn(!!token);
     setUserRole(role); 
+    setUserId(userId); 
   };
 
   useEffect(() => {
@@ -49,9 +53,11 @@ function AppContent() {
   const handleLogout = () => {
     document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     localStorage.removeItem('token');
-    localStorage.removeItem('userRole'); // Remove role on logout
+    localStorage.removeItem('role');
+    localStorage.removeItem('userId'); // Remove role on logout
     setIsLoggedIn(false);
     setUserRole(null);
+    setUserId(null);
     navigate('/login');
   };
 
@@ -106,6 +112,7 @@ function AppContent() {
           )}
           {!isLoggedIn && <Route path="createuser" element={<CreateUser />} />}
           <Route path="login" element={<Login onLoginSuccess={checkLoginStatus} />} />
+          <Route path="tournament/:id" element={<TournamentDetails />} />
         </Routes>
       </div>
     </>
