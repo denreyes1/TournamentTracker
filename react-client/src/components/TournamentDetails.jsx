@@ -113,7 +113,7 @@ function TournamentDetails() {
         {/* Players Header and Search Bar in Same Line */}
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h5 className="mb-0">Players</h5>
-          {role === "Admin" && !isCompleted && (
+          {role === "Admin" && (
             <div style={{ width: "250px" }}>
               <Form.Control
                 type="text"

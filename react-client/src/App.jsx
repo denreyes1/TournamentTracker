@@ -35,6 +35,7 @@ function AppContent() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userId, setUserId] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const [username, setUsername] = useState(null);
 
   // Function to check login status and user role
   const checkLoginStatus = () => {
@@ -43,6 +44,7 @@ function AppContent() {
     const userId = localStorage.getItem('userId');
     setIsLoggedIn(!!token);
     setUserRole(role); 
+    setUsername(username); 
     setUserId(userId); 
   };
 
@@ -54,9 +56,11 @@ function AppContent() {
     document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     localStorage.removeItem('token');
     localStorage.removeItem('role');
+    localStorage.removeItem('username');
     localStorage.removeItem('userId'); // Remove role on logout
     setIsLoggedIn(false);
     setUserRole(null);
+    setUsername(null);
     setUserId(null);
     navigate('/home');
   };

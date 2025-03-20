@@ -53,11 +53,13 @@ function Login({ onLoginSuccess }) {
             if (data?.loginUser?.user) {
                 const userId = data.loginUser.user.id;
                 const role = data.loginUser.user.role;
+                const username = data.loginUser.user.username;
 
                 // Store authentication details
                 document.cookie = "token=loggedin; path=/";
                 localStorage.setItem("token", "loggedin");
                 localStorage.setItem("role", role);
+                localStorage.setItem("username", username);
 
                 if (role === "Player") {
                     // Fetch player ID using userId
