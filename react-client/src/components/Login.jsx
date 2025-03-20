@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { gql, useMutation, useLazyQuery } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
-import { Container, Form, Button, Alert } from "react-bootstrap";
+import { Container, Form, Button, Alert, Card } from "react-bootstrap";
 
 // GraphQL Mutation for Login
 const LOGIN_USER = gql`
@@ -89,8 +89,9 @@ function Login({ onLoginSuccess }) {
     };
 
     return (
-        <Container style={{ maxWidth: "400px", marginTop: "30px" }}>
-            <h2>Login</h2>
+        <Container className="d-flex justify-content-center align-items-center" style={{ marginTop: "50px" }}>
+          <Card style={{ width: "50vw", maxWidth: "500px", padding: "32px" }}>
+          <h2 style={{ marginTop: "20px", marginBottom: "12px" }}>Login</h2>
 
             {formError && <Alert variant="danger">{formError}</Alert>}
             {error && <Alert variant="danger">GraphQL Error: {error.message}</Alert>}
@@ -121,6 +122,7 @@ function Login({ onLoginSuccess }) {
                     Login
                 </Button>
             </Form>
+            </Card>
         </Container>
     );
 }

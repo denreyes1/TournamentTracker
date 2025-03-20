@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { gql, useQuery } from "@apollo/client";
-import { Container, Table, Alert } from "react-bootstrap";
+import { Container, Table, Alert, Card } from "react-bootstrap";
 
 const GET_TOURNAMENTS = gql`
   query GetTournaments {
@@ -29,8 +29,9 @@ function TournamentHistory() {
   if (error) return <Alert variant="danger">Error loading tournaments</Alert>;
 
   return (
-    <Container style={{ marginTop: "20px" }}>
-      <h2>Tournament List</h2>
+    <Container className="d-flex justify-content-center align-items-center" style={{ marginTop: "50px" }}>
+      <Card style={{ width: "80vw", maxWidth: "1200px", padding: "32px" }}>
+      <h2 style={{ marginTop: "20px", marginBottom: "12px" }}>Tournament List</h2>
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -60,11 +61,13 @@ function TournamentHistory() {
               <td>{tournament.status}</td>
               <td>
                 {tournament.players.length > 0 ? (
-                  <ul style={{ margin: 0, paddingLeft: "15px" }}>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                     {tournament.players.map((player) => (
-                      <li key={player.id}>{player.user.username}</li>
+                      <span key={player.id} className="badge bg-dark">
+                        {player.user.username}
+                      </span>
                     ))}
-                  </ul>
+                  </div>
                 ) : (
                   "No Players"
                 )}
@@ -73,6 +76,7 @@ function TournamentHistory() {
           ))}
         </tbody>
       </Table>
+      </Card>
     </Container>
   );
 }

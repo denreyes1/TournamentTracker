@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { gql, useMutation } from "@apollo/client";
 import { useNavigate } from 'react-router-dom';
-import { Container, Form, Button, Alert } from 'react-bootstrap';
+import { Container, Form, Button, Alert, Card } from 'react-bootstrap';
 
 // GraphQL Mutation for Creating a Tournament
 const CREATE_TOURNAMENT = gql`
@@ -53,15 +53,16 @@ function CreateTournament() {
             setStatus('Upcoming');
 
             // Navigate to tournament list
-            navigate('/tournamentlist');
+            navigate('/listtournament');
         } catch (err) {
             setFormError("Error creating tournament. Please try again.");
         }
     };
 
     return (
-        <Container style={{ maxWidth: '500px', marginTop: '20px' }}>
-            <h2>Create Tournament</h2>
+        <Container className="d-flex justify-content-center align-items-center" style={{ marginTop: "50px" }}>
+          <Card style={{ width: "50vw", maxWidth: "500px", padding: "32px" }}>
+          <h2 style={{ marginTop: "20px", marginBottom: "12px" }}>Create Tournament</h2>
 
             {formError && <Alert variant="danger">{formError}</Alert>}
             {error && <Alert variant="danger">GraphQL Error: {error.message}</Alert>}
@@ -110,6 +111,7 @@ function CreateTournament() {
                     Create Tournament
                 </Button>
             </Form>
+            </Card>
         </Container>
     );
 }

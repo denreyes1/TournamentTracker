@@ -99,7 +99,7 @@ function TournamentDetails() {
 
   return (
     <Container className="d-flex justify-content-center align-items-center" style={{ marginTop: "50px" }}>
-      <Card style={{ width: "80vw", maxWidth: "1200px", padding: "20px" }}>
+      <Card style={{ width: "80vw", maxWidth: "1200px", padding: "32px" }}>
         <h3 className="text-center">{tournament.name}</h3>
         <p className="text-center">
           <strong>Game:</strong> {tournament.game} | <strong>Date:</strong> {new Date(Number(tournament.date)).toLocaleDateString("en-US")} | <strong>Status:</strong> {tournament.status}

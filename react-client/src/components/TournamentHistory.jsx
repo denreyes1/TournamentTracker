@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { gql, useQuery } from "@apollo/client";
-import { Container, Table, Alert } from "react-bootstrap";
+import { Container, Table, Alert, Card } from "react-bootstrap";
 
 const GET_PLAYER_BY_USER = gql`
   query Player($playerId: ID!) {
@@ -31,8 +31,9 @@ function TournamentHistory() {
   }
 
   return (
-    <Container style={{ marginTop: "20px" }}>
-      <h2>Joined Tournaments</h2>
+    <Container className="d-flex justify-content-center align-items-center" style={{ marginTop: "50px" }}>
+      <Card style={{ width: "80vw", maxWidth: "1200px", padding: "32px" }}>
+      <h2 style={{ marginTop: "20px", marginBottom: "12px" }}>Joined Tournaments</h2>
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -63,6 +64,7 @@ function TournamentHistory() {
           ))}
         </tbody>
       </Table>
+      </Card>
     </Container>
   );
 }

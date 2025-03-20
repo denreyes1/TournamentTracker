@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { useNavigate } from 'react-router-dom';
-import { Container, Form, Button, Alert, Table } from 'react-bootstrap';
+import { Container, Form, Button, Alert, Table, Card } from 'react-bootstrap';
 
 // GraphQL Query to Fetch Users
 const GET_USERS = gql`
@@ -22,8 +22,9 @@ function ListUser() {
     if (error) return <Alert variant="danger">Error loading users: {error.message}</Alert>;
 
     return (
-        <Container style={{ marginTop: '20px' }}>
-            <h2>User List</h2>
+        <Container className="d-flex justify-content-center align-items-center" style={{ marginTop: "50px" }}>
+          <Card style={{ width: "80vw", maxWidth: "1200px", padding: "32px" }}>
+          <h2 style={{ marginTop: "20px", marginBottom: "12px" }}>User List</h2>
             <Table striped bordered hover>
                 <thead>
                     <tr>
@@ -44,6 +45,7 @@ function ListUser() {
                     ))}
                 </tbody>
             </Table>
+            </Card>
         </Container>
     );
 }

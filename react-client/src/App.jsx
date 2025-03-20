@@ -58,7 +58,7 @@ function AppContent() {
     setIsLoggedIn(false);
     setUserRole(null);
     setUserId(null);
-    navigate('/login');
+    navigate('/home');
   };
 
   return (
